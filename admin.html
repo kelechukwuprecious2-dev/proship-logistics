@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProShip - Staff Admin Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+        .sidebar { background: #0f172a; color: #fff; padding: 25px; }
+        .sidebar-logo { font-size: 1.3rem; font-weight: 700; margin-bottom: 40px; }
+        .main-panel { background: #f8fafc; padding: 40px; }
+        .data-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); }
+        .data-table th, .data-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        .data-table th { background: #f1f5f9; font-weight: 600; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-content { background: #fff; border-radius: 12px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; padding: 30px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-full { grid-column: span 2; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="modal" style="background:#0f172a;">
+        <div class="modal-content" style="max-width: 400px; text-align:center;">
+            <h2><i class="fa-solid fa-lock"></i> Staff Login</h2>
+            <p style="margin-bottom: 20px; font-size: 0.85rem; color: #64748b;">Access ProShip Logistics Control Panel</p>
+            <form id="adminLoginForm">
+                <div class="form-group" style="text-align: left; margin-bottom: 15px;">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group" style="text-align: left; margin-bottom: 20px;">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Authenticate</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD LAYOUT -->
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo"><i class="fa-solid fa-truck-fast"></i> ProShip Admin</div>
+            <p style="font-size: 0.8rem; color:#94a3b8; margin-bottom:30px;">Logged in as Dispatcher</p>
+            <button id="logoutBtn" class="btn btn-outline" style="color:#fff; border-color:#334155; width:100%;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+            <div style="margin-top: 30px;">
+                <a href="index.html" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem;"><i class="fa-solid fa-arrow-left"></i> Public Site</a>
+            </div>
+        </aside>
+
+        <!-- Main Panel -->
+        <main class="main-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2>Shipment Management</h2>
+                <button id="openCreateModalBtn" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create New Dispatch</button>
+            </div>
+
+            <!-- Table -->
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Tracking Code</th>
+                        <th>Sender</th>
+                        <th>Receiver</th>
+                        <th>Destination</th>
+                        <th>Status</th>
+                        <th>Est. Delivery</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="shipmentTableBody">
+                    <!-- Dynamic -->
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <!-- CREATE/EDIT MODAL -->
+    <div id="shipmentModal" class="modal hidden">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="modalTitle">Create New Shipment</h3>
+                <span id="closeModal" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+            </div>
+
+            <form id="shipmentForm">
+                <input type="hidden" id="editDocId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Sender Name</label>
+                        <input type="text" id="sName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sender Phone</label>
+                        <input type="text" id="sPhone" required>
+                    </div>
+                    <div class="form-full form-group">
+                        <label>Sender Address</label>
+                        <input type="text" id="sAddr" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Receiver Name</label>
+                        <input type="text" id="rName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Receiver Phone</label>
+                        <input type="text" id="rPhone" required>
+                    </div>
+                    <div class="form-full form-group">
+                        <label>Receiver Address</label>
+                        <input type="text" id="rAddr" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Origin Hub</label>
+                        <input type="text" id="origin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Destination Hub</label>
+                        <input type="text" id="destination" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Current Location</label>
+                        <input type="text" id="currentLoc" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Est. Delivery Date</label>
+                        <input type="date" id="estDelivery" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="status">
+                            <option value="Registered">Registered</option>
+                            <option value="In Transit">In Transit</option>
+                            <option value="Out for Delivery">Out for Delivery</option>
+                            <option value="Delivered">Delivered</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Package Photo (Image URL)</label>
+                        <input type="url" id="photoUrl" placeholder="https://example.com/photo.jpg">
+                    </div>
+
+                    <div class="form-full form-group">
+                        <label>Dispatcher Notes</label>
+                        <textarea id="adminNotes" rows="2"></textarea>
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">Save Shipment Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="admin.js"></script>
+</body>
+</html>

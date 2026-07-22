@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProShip Logistics | Premium Global Freight & Parcel Tracking</title>
+    
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#home" class="logo">
+                <i class="fa-solid fa-truck-fast"></i> ProShip <span>Logistics</span>
+            </a>
+            
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="nav-item active">Home</a></li>
+                <li><a href="#tracking" class="nav-item">Track Shipment</a></li>
+                <li><a href="#services" class="nav-item">Services</a></li>
+                <li><a href="#about" class="nav-item">About Us</a></li>
+                <li><a href="#ratings" class="nav-item">Reviews</a></li>
+                <li><a href="#contact" class="nav-item">Contact</a></li>
+                <li><a href="admin.html" class="admin-btn"><i class="fa-solid fa-lock"></i> Admin Portal</a></li>
+            </ul>
+
+            <div class="hamburger" id="hamburger">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="hero" id="home">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="badge">Next-Gen Logistics</span>
+            <h1>Reliable Global Shipping & Express Freight Services</h1>
+            <p>Seamlessly transport cargo across air, sea, and land with real-time end-to-end status tracking.</p>
+            
+            <!-- Tracking Search Widget -->
+            <div class="hero-tracking-card">
+                <h3><i class="fa-solid fa-magnifying-glass-location"></i> Track Your Package</h3>
+                <form id="heroTrackForm" class="tracking-form">
+                    <input type="text" id="heroTrackInput" placeholder="Enter Tracking Code (e.g., PS-849201)" required>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Track Now</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- TRACKING RESULT SECTION -->
+    <section class="section tracking-section" id="tracking">
+        <div class="container">
+            <div class="section-title">
+                <h2>Shipment Intelligence & Tracking</h2>
+                <p>Enter your unique tracking code below to check real-time status and transit logs.</p>
+            </div>
+
+            <div class="tracking-search-box">
+                <form id="mainTrackForm" class="tracking-form">
+                    <input type="text" id="mainTrackInput" placeholder="Enter Tracking ID (e.g. PS-123456)" required>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-search"></i> Search</button>
+                </form>
+            </div>
+
+            <!-- Result Card (Hidden by Default) -->
+            <div id="trackingResult" class="tracking-result-card hidden">
+                <div class="result-header">
+                    <div>
+                        <span class="sub-label">Tracking Number</span>
+                        <h3 id="resTrackingId">PS-000000</h3>
+                    </div>
+                    <div>
+                        <span id="resStatusBadge" class="status-badge status-pending">Pending</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="resProgressBar" style="width: 25%;"></div>
+                    </div>
+                    <div class="progress-steps">
+                        <div class="step step-completed" id="step-registered">Registered</div>
+                        <div class="step" id="step-transit">In Transit</div>
+                        <div class="step" id="step-outfordelivery">Out for Delivery</div>
+                        <div class="step" id="step-delivered">Delivered</div>
+                    </div>
+                </div>
+
+                <!-- Grid Data -->
+                <div class="details-grid">
+                    <div class="detail-card">
+                        <h4><i class="fa-solid fa-user"></i> Sender Details</h4>
+                        <p><strong>Name:</strong> <span id="resSenderName">--</span></p>
+                        <p><strong>Phone:</strong> <span id="resSenderPhone">--</span></p>
+                        <p><strong>Address:</strong> <span id="resSenderAddr">--</span></p>
+                    </div>
+
+                    <div class="detail-card">
+                        <h4><i class="fa-solid fa-user-check"></i> Receiver Details</h4>
+                        <p><strong>Name:</strong> <span id="resReceiverName">--</span></p>
+                        <p><strong>Phone:</strong> <span id="resReceiverPhone">--</span></p>
+                        <p><strong>Address:</strong> <span id="resReceiverAddr">--</span></p>
+                    </div>
+
+                    <div class="detail-card">
+                        <h4><i class="fa-solid fa-route"></i> Transit Information</h4>
+                        <p><strong>Origin:</strong> <span id="resOrigin">--</span></p>
+                        <p><strong>Destination:</strong> <span id="resDestination">--</span></p>
+                        <p><strong>Current Location:</strong> <span id="resCurrentLoc">--</span></p>
+                        <p><strong>Est. Delivery:</strong> <span id="resEstDelivery">--</span></p>
+                    </div>
+                </div>
+
+                <!-- Admin Photo Section -->
+                <div id="photoContainer" class="photo-container hidden">
+                    <h4><i class="fa-solid fa-image"></i> Package Inspection Photo</h4>
+                    <img id="resShipmentPhoto" src="" alt="Shipment Inspection Photo">
+                </div>
+
+                <!-- Admin Notes -->
+                <div id="notesContainer" class="notes-container hidden">
+                    <h4><i class="fa-solid fa-clipboard-list"></i> Dispatcher Notes</h4>
+                    <p id="resAdminNotes">--</p>
+                </div>
+
+                <!-- Print Action -->
+                <div class="print-action">
+                    <button type="button" id="printReceiptBtn" class="btn btn-outline">
+                        <i class="fa-solid fa-print"></i> Print Official Waybill
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES SECTION -->
+    <section class="section bg-light" id="services">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Global Services</h2>
+                <p>Designed to handle logistics demands of any scale, speed, or complexity.</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-img">
+                        <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80" alt="Warehousing">
+                    </div>
+                    <div class="service-body">
+                        <i class="fa-solid fa-warehouse icon"></i>
+                        <h3>Warehousing & Storage</h3>
+                        <p>Temperature-controlled, high-security modern distribution hubs worldwide.</p>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-img">
+                        <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=600&q=80" alt="Sea Freight">
+                    </div>
+                    <div class="service-body">
+                        <i class="fa-solid fa-ship icon"></i>
+                        <h3>Ocean Cargo Lines</h3>
+                        <p>Full-container (FCL) and consolidated (LCL) global sea shipping.</p>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-img">
+                        <img src="https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=600&q=80" alt="Air Courier">
+                    </div>
+                    <div class="service-body">
+                        <i class="fa-solid fa-plane-departure icon"></i>
+                        <h3>Express Air Courier</h3>
+                        <p>Time-critical express air freight delivery anywhere across continents.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="section" id="about">
+        <div class="container about-grid">
+            <div class="about-content">
+                <span class="badge">Who We Are</span>
+                <h2>Connecting Markets With Precision & Speed</h2>
+                <p>ProShip Logistics operates a multi-modal transport network backed by robust technology. Whether you are dispatching express parcels or heavy industrial machinery, our system guarantees total visibility from pickup to doorstep.</p>
+                
+                <div class="stats-row">
+                    <div class="stat">
+                        <h3>120+</h3>
+                        <p>Countries Served</p>
+                    </div>
+                    <div class="stat">
+                        <h3>2.5M+</h3>
+                        <p>Packages Moved</p>
+                    </div>
+                    <div class="stat">
+                        <h3>99.4%</h3>
+                        <p>On-Time Arrival</p>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=800&q=80" alt="Logistics Fleet">
+            </div>
+        </div>
+    </section>
+
+    <!-- RATINGS & REVIEWS SECTION -->
+    <section class="section bg-light" id="ratings">
+        <div class="container">
+            <div class="section-title">
+                <h2>Client Feedback & Ratings</h2>
+                <p>Read real client reviews or share your experience with our services.</p>
+            </div>
+
+            <!-- Average Summary -->
+            <div class="rating-summary">
+                <div class="avg-score">
+                    <h2 id="avgRatingScore">0.0</h2>
+                    <div class="stars-display" id="avgRatingStars">
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                    </div>
+                    <p>Based on <span id="totalReviewsCount">0</span> client reviews</p>
+                </div>
+
+                <!-- Review Form -->
+                <form id="reviewForm" class="review-form">
+                    <h4>Leave a Service Review</h4>
+                    <div class="form-group">
+                        <label>Your Full Name</label>
+                        <input type="text" id="reviewerName" placeholder="e.g. Jane Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Rating Score</label>
+                        <div class="star-rating-select" id="starSelect">
+                            <i class="fa-regular fa-star" data-value="1"></i>
+                            <i class="fa-regular fa-star" data-value="2"></i>
+                            <i class="fa-regular fa-star" data-value="3"></i>
+                            <i class="fa-regular fa-star" data-value="4"></i>
+                            <i class="fa-regular fa-star" data-value="5"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Review Comments</label>
+                        <textarea id="reviewerComment" rows="3" placeholder="Share details about speed, handling, or customer care..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+
+            <!-- Reviews Feed -->
+            <div class="reviews-feed" id="reviewsFeed">
+                <!-- Dynamically Rendered -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="section" id="contact">
+        <div class="container">
+            <div class="section-title">
+                <h2>Contact Our Support Team</h2>
+                <p>Get immediate help regarding your shipment or commercial freight quotes.</p>
+            </div>
+
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="info-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div>
+                            <h4>Global Headquarters</h4>
+                            <p>100 Logistics Way, Suite 400, New York, NY 10001</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fa-solid fa-phone"></i>
+                        <div>
+                            <h4>Call Dispatch Center</h4>
+                            <p>+1 (800) 555-PROSHIP</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fa-solid fa-envelope"></i>
+                        <div>
+                            <h4>Email Enquiries</h4>
+                            <p>support@proshiplogistics.com</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="contactForm" class="contact-form">
+                    <div class="form-group">
+                        <input type="text" placeholder="Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" placeholder="Email Address" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea rows="4" placeholder="Your Message or Enquiry" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-col">
+                <h3><i class="fa-solid fa-truck-fast"></i> ProShip</h3>
+                <p>End-to-end supply chain execution, express parcel distribution, and high-security air & ocean freight solutions.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#tracking">Shipment Tracker</a></li>
+                    <li><a href="#services">Our Services</a></li>
+                    <li><a href="#ratings">Client Feedback</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Admin</h4>
+                <ul>
+                    <li><a href="admin.html">Staff Login Portal</a></li>
+                    <li><a href="#contact">Dispatch Desk</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Social Connect</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 ProShip Logistics Inc. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Firebase SDKs (v9 Modular Compat Scripts) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <script src="script.js"></script>
+</body>
+</html>
