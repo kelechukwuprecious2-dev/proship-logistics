@@ -171,5 +171,27 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <script src="admin.js"></script>
+<!-- Firebase SDKs for Browser -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // Your Web App's Firebase Configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5Wwex6mXqaKspQUAfnuDWyiTf9Qtbwok",
+    authDomain: "proshiplogistics-987cc.firebaseapp.com",
+    projectId: "proshiplogistics-987cc",
+    storageBucket: "proshiplogistics-987cc.firebasestorage.app",
+    messagingSenderId: "390254122810",
+    appId: "1:390254122810:web:716a6b7e3173bdcbc26203",
+    measurementId: "G-LC481GRQYN"
+  };
+
+  // Initialize Firebase Services
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+</script>
 </body>
 </html>
