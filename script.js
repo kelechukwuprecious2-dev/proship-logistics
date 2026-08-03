@@ -1,265 +1,177 @@
 // ==========================================
-// PROSHIP LOGISTICS - PUBLIC SCRIPT
+// PROSHIP LOGISTICS - PUBLIC SCRIPT (v10 Modular)
 // ==========================================
 
-// --- FIREBASE CONFIGURATION ---
-// REPLACE WITH YOUR FIREBASE PROJECT CONFIG
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { 
+    getFirestore, 
+    collection, 
+    query, 
+    where, 
+    getDocs 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// Firebase Configuration
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyD5Wwex6mXqaKspQUAfnuDWyiTf9Qtbwok",
+    authDomain: "proshiplogistics-987cc.firebaseapp.com",
+    databaseURL: "https://proshiplogistics-987cc-default-rtdb.firebaseio.com",
+    projectId: "proshiplogistics-987cc",
+    storageBucket: "proshiplogistics-987cc.firebasestorage.app",
+    messagingSenderId: "390254122810",
+    appId: "1:390254122810:web:716a6b7e3173bdcbc26203",
+    measurementId: "G-LC481GRQYN"
 };
 
-// Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-// --- DOM INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    initNavigation();
-    initTrackingForms();
-    initStarRatingSelect();
-    initReviewsSystem();
-});
-
-// --- NAVIGATION & MOBILE MENU ---
-function initNavigation() {
-    const hamburger = document.getElementById('hamburger');
-    const navLinks = document.getElementById('navLinks');
-
-    if (hamburger && navLinks) {
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-        });
-
-        document.querySelectorAll('.nav-item').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-            });
-        });
-    }
-}
-
-// --- TRACKING ENGINE ---
-function initTrackingForms() {
+    // 1. Attach listener to Hero Tracking Form
     const heroForm = document.getElementById('heroTrackForm');
-    const mainForm = document.getElementById('mainTrackForm');
-
     if (heroForm) {
         heroForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const val = document.getElementById('heroTrackInput').value.trim().toUpperCase();
-            if (val) executeTracking(val);
+            const code = document.getElementById('heroTrackInput').value;
+            handleTrackingSearch(code);
         });
     }
 
+    // 2. Attach listener to Main Tracking Form
+    const mainForm = document.getElementById('mainTrackForm');
     if (mainForm) {
         mainForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const val = document.getElementById('mainTrackInput').value.trim().toUpperCase();
-            if (val) executeTracking(val);
+            const code = document.getElementById('mainTrackInput').value;
+            handleTrackingSearch(code);
         });
     }
 
-    // Auto-search if URL query has ?track=CODE
-    const urlParams = new URLSearchParams(window.location.search);
-    const codeFromUrl = urlParams.get('track');
-    if (codeFromUrl) {
-        executeTracking(codeFromUrl.toUpperCase());
-    }
-
-    // Print Button Attachment
+    // 3. Attach Print Button Listener
     const printBtn = document.getElementById('printReceiptBtn');
-    if(printBtn) {
+    if (printBtn) {
         printBtn.addEventListener('click', () => {
             window.print();
         });
     }
-}
+});
 
-async function executeTracking(trackingCode) {
-    const resultCard = document.getElementById('tracking-result') || document.getElementById('trackingResult');
-    
+async function handleTrackingSearch(rawCode) {
+    const resultContainer = document.getElementById('trackingResult');
+    if (!resultContainer) return;
+
+    let trackingInput = rawCode ? rawCode.trim().toUpperCase() : '';
+    if (!trackingInput) return;
+
+    // Scroll to tracking section
+    const trackingSection = document.getElementById('tracking');
+    if (trackingSection) trackingSection.scrollIntoView({ behavior: 'smooth' });
+
     try {
-        const querySnapshot = await db.collection('shipments').where('trackingCode', '==', trackingCode).get();
+        const q = query(
+            collection(db, 'shipments'), 
+            where('trackingCode', '==', trackingInput)
+        );
+        const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
-            alert(`No shipment found with tracking number: ${trackingCode}`);
+            alert(`No shipment record found for tracking ID: ${trackingInput}`);
             return;
         }
 
-        const data = querySnapshot.docs[0].data();
-        renderTrackingDetails(data);
+        // Unhide result container
+        resultContainer.classList.remove('hidden');
 
-        if (resultCard) {
-            resultCard.classList.remove('hidden');
-            resultCard.scrollIntoView({ behavior: 'smooth' });
-        }
+        querySnapshot.forEach((doc) => {
+            renderShipmentData(doc.data());
+        });
 
     } catch (error) {
-        console.error("Tracking Error: ", error);
-        alert("Error retrieving shipment details. Please try again.");
+        console.error("Tracking Search Error:", error);
+        alert("Error fetching shipment record: " + error.message);
     }
 }
 
-function renderTrackingDetails(data) {
-    const setTxt = (id, val) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = val || '--';
-    };
+function renderShipmentData(data) {
+    // Header & Status
+    document.getElementById('resTrackingId').textContent = data.trackingCode || 'N/A';
+    
+    const statusBadge = document.getElementById('resStatusBadge');
+    const currentStatus = data.status || 'Pending';
+    statusBadge.textContent = currentStatus;
 
-    setTxt('resTrackingId', data.trackingCode);
-    setTxt('resSenderName', data.senderName);
-    setTxt('resSenderPhone', data.senderPhone);
-    setTxt('resSenderAddr', data.senderAddress);
-    setTxt('resReceiverName', data.receiverName);
-    setTxt('resReceiverPhone', data.receiverPhone);
-    setTxt('resReceiverAddr', data.receiverAddress);
-    setTxt('resOrigin', data.origin);
-    setTxt('resDestination', data.destination);
-    setTxt('resCurrentLoc', data.currentLocation);
-    setTxt('resEstDelivery', data.estDelivery);
+    // Sender Info
+    document.getElementById('resSenderName').textContent = data.senderName || '--';
+    document.getElementById('resSenderPhone').textContent = data.senderPhone || '--';
+    document.getElementById('resSenderAddr').textContent = data.origin || '--';
 
-    // Update Status Badge & Progress Bar
-    const badge = document.getElementById('resStatusBadge');
-    const progressBar = document.getElementById('resProgressBar');
-    const status = data.status || 'Registered';
+    // Receiver Info
+    document.getElementById('resReceiverName').textContent = data.receiverName || '--';
+    document.getElementById('resReceiverPhone').textContent = data.receiverPhone || '--';
+    document.getElementById('resReceiverAddr').textContent = data.destination || '--';
 
-    if (badge) {
-        badge.textContent = status;
-        badge.className = 'status-badge';
-        if (status === 'Delivered') badge.classList.add('status-delivered');
-        else if (status === 'In Transit' || status === 'Out for Delivery') badge.classList.add('status-transit');
-        else badge.classList.add('status-pending');
-    }
+    // Transit Info
+    document.getElementById('resOrigin').textContent = data.origin || '--';
+    document.getElementById('resDestination').textContent = data.destination || '--';
+    document.getElementById('resCurrentLoc').textContent = data.currentLocation || '--';
+    document.getElementById('resEstDelivery').textContent = data.estDelivery || '--';
 
-    if (progressBar) {
-        let width = '25%';
-        if (status === 'In Transit') width = '50%';
-        else if (status === 'Out for Delivery') width = '75%';
-        else if (status === 'Delivered') width = '100%';
-        progressBar.style.width = width;
-    }
-
-    // Photo Box
+    // Photo Handling
     const photoContainer = document.getElementById('photoContainer');
     const photoImg = document.getElementById('resShipmentPhoto');
     if (data.photoUrl) {
         photoImg.src = data.photoUrl;
         photoContainer.classList.remove('hidden');
-    } else if (photoContainer) {
+    } else {
         photoContainer.classList.add('hidden');
     }
 
-    // Admin Notes
+    // Notes Handling
     const notesContainer = document.getElementById('notesContainer');
+    const adminNotes = document.getElementById('resAdminNotes');
     if (data.notes) {
-        setTxt('resAdminNotes', data.notes);
+        adminNotes.textContent = data.notes;
         notesContainer.classList.remove('hidden');
-    } else if (notesContainer) {
+    } else {
         notesContainer.classList.add('hidden');
     }
+
+    // Progress Bar Calculation
+    updateProgressBar(currentStatus);
 }
 
-// --- RATINGS AND REVIEWS ---
-let selectedStarValue = 0;
+function updateProgressBar(status) {
+    const progressBar = document.getElementById('resProgressBar');
+    const stepRegistered = document.getElementById('step-registered');
+    const stepTransit = document.getElementById('step-transit');
+    const stepOut = document.getElementById('step-outfordelivery');
+    const stepDelivered = document.getElementById('step-delivered');
 
-function initStarRatingSelect() {
-    const stars = document.querySelectorAll('#starSelect i');
-    stars.forEach(star => {
-        star.addEventListener('click', () => {
-            selectedStarValue = parseInt(star.getAttribute('data-value'));
-            updateStarUI(selectedStarValue);
-        });
+    // Reset step classes
+    [stepRegistered, stepTransit, stepOut, stepDelivered].forEach(step => {
+        if (step) step.className = 'step';
     });
-}
 
-function updateStarUI(val) {
-    const stars = document.querySelectorAll('#starSelect i');
-    stars.forEach((star, index) => {
-        if (index < val) {
-            star.className = 'fa-solid fa-star active';
-        } else {
-            star.className = 'fa-regular fa-star';
-        }
-    });
-}
+    const statusLower = status.toLowerCase();
 
-function initReviewsSystem() {
-    const reviewForm = document.getElementById('reviewForm');
-    
-    if (reviewForm) {
-        reviewForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('reviewerName').value.trim();
-            const comment = document.getElementById('reviewerComment').value.trim();
-
-            if (selectedStarValue === 0) {
-                alert("Please select a star rating!");
-                return;
-            }
-
-            try {
-                await db.collection('reviews').add({
-                    name,
-                    rating: selectedStarValue,
-                    comment,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                reviewForm.reset();
-                selectedStarValue = 0;
-                updateStarUI(0);
-                alert("Thank you! Your review has been published.");
-                loadReviews();
-            } catch (err) {
-                console.error("Review Error: ", err);
-            }
-        });
-    }
-
-    loadReviews();
-}
-
-async function loadReviews() {
-    const feed = document.getElementById('reviewsFeed');
-    if (!feed) return;
-
-    try {
-        const snapshot = await db.collection('reviews').orderBy('timestamp', 'desc').get();
-        feed.innerHTML = '';
-
-        let totalScore = 0;
-        let count = 0;
-
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            totalScore += data.rating;
-            count++;
-
-            const card = document.createElement('div');
-            card.className = 'review-card';
-            card.innerHTML = `
-                <div style="display:flex; justify-between; align-items:center; margin-bottom: 8px;">
-                    <strong>${data.name}</strong>
-                    <span style="color:#f59e0b;">${'★'.repeat(data.rating)}</span>
-                </div>
-                <p style="font-size:0.9rem; color:#475569;">"${data.comment}"</p>
-            `;
-            feed.appendChild(card);
-        });
-
-        // Update Average Summary
-        const avg = count > 0 ? (totalScore / count).toFixed(1) : "0.0";
-        document.getElementById('avgRatingScore').textContent = avg;
-        document.getElementById('totalReviewsCount').textContent = count;
-
-    } catch (err) {
-        console.error("Error loading reviews:", err);
+    if (statusLower.includes('deliver')) {
+        if (progressBar) progressBar.style.width = '100%';
+        if (stepRegistered) stepRegistered.classList.add('step-completed');
+        if (stepTransit) stepTransit.classList.add('step-completed');
+        if (stepOut) stepOut.classList.add('step-completed');
+        if (stepDelivered) stepDelivered.classList.add('step-completed');
+    } else if (statusLower.includes('out')) {
+        if (progressBar) progressBar.style.width = '75%';
+        if (stepRegistered) stepRegistered.classList.add('step-completed');
+        if (stepTransit) stepTransit.classList.add('step-completed');
+        if (stepOut) stepOut.classList.add('step-completed');
+    } else if (statusLower.includes('transit')) {
+        if (progressBar) progressBar.style.width = '50%';
+        if (stepRegistered) stepRegistered.classList.add('step-completed');
+        if (stepTransit) stepTransit.classList.add('step-completed');
+    } else {
+        // Pending / Registered
+        if (progressBar) progressBar.style.width = '25%';
+        if (stepRegistered) stepRegistered.classList.add('step-completed');
     }
 }

@@ -622,3 +622,87 @@ body {
         flex-direction: column;
     }
 }
+/* ==========================================
+   PRINT STYLES & TRACKING RESULT OVERRIDES
+   ========================================== */
+
+/* Ensure dynamically populated tracking results unhide properly */
+#trackingResult:not(.hidden) {
+    display: block !important;
+}
+
+@media print {
+    /* Hide non-essential layout elements during printing */
+    .navbar, 
+    .hero, 
+    .tracking-search-box, 
+    .footer, 
+    .print-action, 
+    .no-print,
+    .services-grid,
+    .about-grid,
+    .contact-grid {
+        display: none !important;
+    }
+
+    body, html {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .tracking-result-card, #printableShipment {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        padding: 20px !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+}
+/* ==========================================
+   PRINT STYLESHEET (For Clean Shipping Receipts)
+   ========================================== */
+@media print {
+    /* Hide non-essential layout elements during printing */
+    .navbar, 
+    .hero, 
+    .tracking-search-box, 
+    .footer, 
+    .print-action, 
+    .no-print,
+    .services-grid,
+    .about-grid,
+    .contact-grid,
+    form,
+    button {
+        display: none !important;
+    }
+
+    body, html {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Target and expand the print receipt card */
+    .tracking-result-card, 
+    #printableShipment, 
+    #trackingResult {
+        display: block !important;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        padding: 20px !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        page-break-inside: avoid;
+    }
+
+    /* Ensure text and badges print clearly */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
